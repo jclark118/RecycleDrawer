@@ -37,6 +37,12 @@ public class MainActivity extends AppCompatActivity {
      */
     private LocationAdapter locationAdapter;
 
+    /**
+     * Floating action button to create new location
+     */
+    private FloatingActionButton fab;
+
+
 
 
     /**
@@ -47,16 +53,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
+        // Create floating action button
+        createFab();
 
         // Generate a list of locations
         generateLocations();
@@ -92,7 +91,20 @@ public class MainActivity extends AppCompatActivity {
         // Create the adapter
         locationAdapter = new LocationAdapter(locations);
         locationRecycler.setAdapter(locationAdapter);
+    }
 
+    /**
+     * Set up the Floating action button
+     */
+    private void createFab(){
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
     }
 
     @Override

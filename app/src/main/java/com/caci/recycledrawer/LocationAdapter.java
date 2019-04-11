@@ -1,6 +1,7 @@
 package com.caci.recycledrawer;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
      */
     @Override
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
+        Log.i("bind","Binding location: " + position);
         holder.name.setText(locations.get(position));
     }
 
