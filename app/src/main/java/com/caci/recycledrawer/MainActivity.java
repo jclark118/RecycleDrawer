@@ -7,20 +7,48 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Creates a RecyclerView of a list of locations and gives it a bottom drawer behavior
+ */
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * List of location names
+     */
+    private List<String> locations = new ArrayList<>();
+
+    /**
+     * RecyclerView that will hold our locations
+     */
+    private RecyclerView locationRecycler;
+
+    /**
+     * Adapter for the location recycler view
+     */
+    private LocationAdapter locationAdapter;
+
+
+
+    /**
+     * Create the view
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -29,6 +57,42 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        // Generate a list of locations
+        generateLocations();
+
+        // Create the RecyclerView
+        createRecyclerView();
+
+    }
+
+
+
+    /**
+     * Populate our location list
+     */
+    private void generateLocations(){
+        for(int i=0; i<50; i++){
+            String location = "City " + i;
+            locations.add(location);
+        }
+    }
+
+    /**
+     * Create the recycler view containing our locations
+     */
+    private void createRecyclerView(){
+        // Attach the xml
+        locationRecycler = (RecyclerView) findViewById(R.id.recycler_locations);
+
+        // Create a layout manager
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        locationRecycler.setLayoutManager(layoutManager);
+
+        // Create the adapter
+        locationAdapter = new LocationAdapter(locations);
+        locationRecycler.setAdapter(locationAdapter);
+
     }
 
     @Override
