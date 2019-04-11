@@ -10,11 +10,20 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -66,14 +75,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * open the locations file and parse
+     */
+    private String getLocations(){
+        String json = null;
+        try {
+            InputStream is = getApplication().getAssets().open("cities.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+    }
 
     /**
-     * Populate our location list
+     * Populate our location list from the json data
      */
     private void generateLocations(){
-        for(int i=0; i<50; i++){
-            String location = "City " + i;
-            locations.add(location);
+        try {
+            JSONArray array = new JSONArray(getLocations());
+            for(int i=0; i<array.length(); i++){
+                JSONObject row = array.getJSONObject(i);
+                if(!locations.contains(row.get("state"))) {
+                    locations.add(row.get("state").toString());
+                    Collections.sort(locations);
+                }
+            }
+        }catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
