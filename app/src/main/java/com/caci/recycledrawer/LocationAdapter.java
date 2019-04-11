@@ -119,6 +119,10 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         }
     }
 
+    /**
+     * Interface for the click listener on our recyclerview
+     * ----------------------------------------------------
+     */
     public interface RecyclerViewClickListener {
         void onClick(String name);
     }

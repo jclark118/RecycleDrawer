@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
     }
 
     /**
-     * On click listener - what do to with the string that we're given when a location is clicked
+     * On click listener - show which location is clicked
      * @param location - the clicked location
      */
     @Override
@@ -154,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
             }
         });
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
