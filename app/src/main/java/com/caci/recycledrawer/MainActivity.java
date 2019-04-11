@@ -1,5 +1,6 @@
 package com.caci.recycledrawer;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,7 +31,7 @@ import java.util.List;
 /**
  * Creates a RecyclerView of a list of locations and gives it a bottom drawer behavior
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationAdapter.RecyclerViewClickListener {
 
     /**
      * List of location names
@@ -124,8 +126,19 @@ public class MainActivity extends AppCompatActivity {
         locationRecycler.setLayoutManager(layoutManager);
 
         // Create the adapter
-        locationAdapter = new LocationAdapter(locations);
+        locationAdapter = new LocationAdapter(locations, this);
         locationRecycler.setAdapter(locationAdapter);
+    }
+
+    /**
+     * On click listener - what do to with the string that we're given when a location is clicked
+     * @param location - the clicked location
+     */
+    @Override
+    public void onClick(String location) {
+        Context context = this;
+        Toast.makeText(context, location, Toast.LENGTH_SHORT)
+                .show();
     }
 
     /**

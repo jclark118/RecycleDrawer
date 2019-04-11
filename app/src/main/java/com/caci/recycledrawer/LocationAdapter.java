@@ -21,14 +21,20 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
     /**
      * List of location names
      */
-    List<String> locations = new ArrayList<>();
+    List<String> mLocations = new ArrayList<>();
+
+    /**
+     * Click listener
+     */
+    private RecyclerViewClickListener mListener;
 
     /**
      * Constructor
      * @param locations - ArrayList of location names
      */
-    public LocationAdapter(List<String> locations){
-        this.locations = locations;
+    public LocationAdapter(List<String> locations, RecyclerViewClickListener listener){
+        mLocations = locations;
+        mListener = listener;
     }
 
     /**
@@ -54,7 +60,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
     @Override
     public void onBindViewHolder(@NonNull LocationViewHolder holder, int position) {
         Log.i("bind","Binding location: " + position);
-        holder.name.setText(locations.get(position));
+        holder.name.setText(mLocations.get(position));
     }
 
     /**
@@ -63,7 +69,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
      */
     @Override
     public int getItemCount() {
-        return locations.size();
+        return mLocations.size();
     }
 
 
@@ -73,7 +79,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
      * View holder for an individual location item
      * -------------------------------------------
      */
-    public class LocationViewHolder extends RecyclerView.ViewHolder{
+    public class LocationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         /**
          * Name of the Location
@@ -87,6 +93,17 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         public LocationViewHolder(@NonNull View itemView) {
             super(itemView);
             name = (TextView) itemView.findViewById(R.id.location_name);
+            itemView.setOnClickListener(this);
+        }
+
+        /**
+         * Click listener
+         * @param view - clicked view
+         */
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            mListener.onClick(mLocations.get(adapterPosition));
         }
 
         /**
@@ -100,5 +117,9 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         public void setName(TextView name) {
             this.name = name;
         }
+    }
+
+    public interface RecyclerViewClickListener {
+        void onClick(String name);
     }
 }
