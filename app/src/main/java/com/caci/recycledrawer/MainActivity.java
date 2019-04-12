@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * Creates a RecyclerView of a list of states and gives it a bottom drawer behavior
  */
-public class MainActivity extends AppCompatActivity implements LocationAdapter.RecyclerViewClickListener {
+public class MainActivity extends AppCompatActivity {
 
     /**
      * List of location names
@@ -68,6 +68,16 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
      */
     private List<Location> locations = new ArrayList<>();
 
+    /**
+     * Click listener to be given to the recyclerview when a user clicks on a city
+     */
+    private LocationAdapter.RecyclerViewClickListener cityListerner;
+
+    /**
+     * Click listener to be given to the recyclerview when a user clicks on a state
+     */
+    private LocationAdapter.RecyclerViewClickListener stateListerner;
+
 
 
 
@@ -79,6 +89,9 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize the state and city click listeners
+        createListeners();
 
         // Create floating action button
         createFab();
@@ -106,45 +119,27 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
         locationRecycler.setLayoutManager(layoutManager);
 
         // Create the adapter
-        locationAdapter = new LocationAdapter(states, this);
+        locationAdapter = new LocationAdapter(states, stateListerner);
         locationRecycler.setAdapter(locationAdapter);
     }
 
-    /**
-     * On click listener - show which location is clicked
-     * @param position - the clicked location
-     */
-    @Override
-    public void onClick(int position) {
-        Context context = this;
-        String state = states.get(position);
-        removeAllLocations();
-        putCitiesInRecycler(state);
-
-//        Toast.makeText(context, "removing: " + String.valueOf(position), Toast.LENGTH_SHORT)
-//                .show();
-//        removeLocation(position);
-
-    }
-
 
 
 
 
     /**
-     * Remove a location from our list, and remove it from the RecyclerView
+     * Remove a location from the RecyclerView
      * @param position - the item to remove
      */
     public void removeLocation(int position){
-        states.remove(position);
+//        states.remove(position);
         locationAdapter.notifyItemRemoved(position);
     }
 
     /**
-     * Remove all states from the list, and remove them from the RecyclerView
+     * Remove all states from the adapter, which will empty the recyclerview
      */
     public void removeAllLocations(){
-        states.clear();
         locationAdapter.clear();
         locationAdapter.notifyDataSetChanged();
     }
@@ -153,10 +148,39 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
      * Give the list of cities (by state) to the adapter and bind
      */
     public void putCitiesInRecycler(String state){
-        cityAdapter = new LocationAdapter(getCitiesByState(state), this);
-        locationRecycler.swapAdapter(cityAdapter, true);
+        cityAdapter = new LocationAdapter(getCitiesByState(state), cityListerner);
+        // Give the recyclerview a new adapter.  We can't use "swapAdapter" because that will
+        // keep the same click listener as before, when we really need a new click listener to
+        // know what to do when clicking on a city
+        locationRecycler.setAdapter(cityAdapter);
+//        locationRecycler.swapAdapter(cityAdapter, true);
+
     }
 
+    /**
+     * Create the listeners to be used in the onclick for the recyclerview
+     */
+    public void createListeners(){
+        // Log which city was clicked on
+        cityListerner = new LocationAdapter.RecyclerViewClickListener() {
+            @Override
+            public void onClick(int position) {
+                Log.i("Click", "Clicked city: " + position);
+            }
+        };
+
+        // State listener will empty out all the state entries from the recyclerview, and attach
+        // a new adapter to populate it with the list of cities for the state that was clicked on
+        stateListerner = new LocationAdapter.RecyclerViewClickListener() {
+            @Override
+            public void onClick(int position) {
+                Log.i("Click", "Clicked state: " + position);
+                String state = states.get(position);
+                removeAllLocations();
+                putCitiesInRecycler(state);
+            }
+        };
+    }
 
 
 
