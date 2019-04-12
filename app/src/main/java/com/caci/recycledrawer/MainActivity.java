@@ -127,29 +127,22 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         locationRecycler.setLayoutManager(layoutManager);
 
-        // Create the adapter
+        // Create the adapter and set it for the recyclerview
         locationAdapter = new LocationAdapter(states, stateListerner);
+        putStatesInRecycler();
+    }
+
+
+
+
+
+
+    /**
+     * Switch the adapter for the recyclerview to the locationAdapter.  This will populate
+     * the recyclerview with the list of states.
+     */
+    public void putStatesInRecycler(){
         locationRecycler.setAdapter(locationAdapter);
-    }
-
-
-
-
-
-    /**
-     * Remove a location from the RecyclerView
-     * @param position - the item to remove
-     */
-    public void removeLocation(int position){
-        locationAdapter.notifyItemRemoved(position);
-    }
-
-    /**
-     * Remove all objects from the adapter, which will empty the recyclerview
-     */
-    public void removeAllLocations(){
-        locationAdapter.clear();
-        locationAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -178,6 +171,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(int position) {
                 Log.i("Click", "Clicked city: " + position);
+                //removeAllLocations();
+                putStatesInRecycler();
             }
         };
 
@@ -189,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("Click", "Clicked state: " + position);
                 if(states.get(position) instanceof String) {
                     String state = (String)states.get(position);
-                    removeAllLocations();
+                    //removeAllLocations();
                     putCitiesInRecycler(state);
                 }
             }
@@ -337,5 +332,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Not needed but nice to reference in the future
+     */
+
+    /**
+     * Remove a location from the RecyclerView
+     * @param position - the item to remove
+     */
+    public void removeLocation(int position){
+        locationAdapter.notifyItemRemoved(position);
+    }
+
+    /**
+     * Remove all objects from the adapter, which will empty the recyclerview
+     */
+    public void removeAllLocations(){
+        locationAdapter.clear();
+        locationAdapter.notifyDataSetChanged();
     }
 }
