@@ -21,7 +21,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
     /**
      * List of location names
      */
-    List<String> mLocations = new ArrayList<>();
+    private List<String> mLocations = new ArrayList<>();
 
     /**
      * Click listener
@@ -72,6 +72,31 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         return mLocations.size();
     }
 
+    /**
+     *  Remove all locations
+     */
+    public void clear(){
+        mLocations.clear();
+    }
+
+    /**
+     * Getters and setters
+     */
+    public List<String> getmLocations() {
+        return mLocations;
+    }
+
+    public void setmLocations(List<String> mLocations) {
+        this.mLocations = mLocations;
+    }
+
+    public RecyclerViewClickListener getmListener() {
+        return mListener;
+    }
+
+    public void setmListener(RecyclerViewClickListener mListener) {
+        this.mListener = mListener;
+    }
 
 
 
@@ -103,7 +128,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
-            mListener.onClick(mLocations.get(adapterPosition));
+            mListener.onClick(adapterPosition);
         }
 
         /**
@@ -124,6 +149,6 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.Locati
      * ----------------------------------------------------
      */
     public interface RecyclerViewClickListener {
-        void onClick(String name);
+        void onClick(int position);
     }
 }

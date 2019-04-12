@@ -39,6 +39,11 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
     private List<String> locations = new ArrayList<>();
 
     /**
+     * List of city names
+     */
+    private List<String> cities = new ArrayList<>();
+
+    /**
      * RecyclerView that will hold our locations
      */
     private RecyclerView locationRecycler;
@@ -47,6 +52,11 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
      * Adapter for the location recycler view
      */
     private LocationAdapter locationAdapter;
+
+    /**
+     * Adapter for putting cities in the recyclerview
+     */
+    private LocationAdapter cityAdapter;
 
     /**
      * Floating action button to create new location
@@ -80,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
     /**
      * open the locations file and parse
      */
-    private String getLocations(){
+    private String loadLocations(){
         String json = null;
         try {
             InputStream is = getApplication().getAssets().open("cities.json");
@@ -101,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
      */
     private void generateLocations(){
         try {
-            JSONArray array = new JSONArray(getLocations());
+            JSONArray array = new JSONArray(loadLocations());
             for(int i=0; i<array.length(); i++){
                 JSONObject row = array.getJSONObject(i);
                 if(!locations.contains(row.get("state"))) {
@@ -112,6 +122,17 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
         }catch (JSONException e) {
             e.printStackTrace();
         }
+
+        generateCities();
+    }
+
+    private void generateCities(){
+        cities = new ArrayList<>();
+        cities.add("Austin");
+        cities.add("Boston");
+        cities.add("Denver");
+        cities.add("Herndon");
+        cities.add("LA");
     }
 
     /**
@@ -132,14 +153,44 @@ public class MainActivity extends AppCompatActivity implements LocationAdapter.R
 
     /**
      * On click listener - show which location is clicked
-     * @param location - the clicked location
+     * @param position - the clicked location
      */
     @Override
-    public void onClick(String location) {
+    public void onClick(int position) {
         Context context = this;
-        Toast.makeText(context, location, Toast.LENGTH_SHORT)
-                .show();
+//        Toast.makeText(context, "removing: " + String.valueOf(position), Toast.LENGTH_SHORT)
+//                .show();
+        removeLocation(position);
+//        removeAllLocations();
     }
+
+    /**
+     * Remove a location from our list, and remove it from the RecyclerView
+     * @param position - the item to remove
+     */
+    public void removeLocation(int position){
+        locations.remove(position);
+        locationAdapter.notifyItemRemoved(position);
+    }
+
+    /**
+     * Remove all locations from the list, and remove them from the RecyclerView
+     */
+    public void removeAllLocations(){
+        locations.clear();
+        locationAdapter.clear();
+        locationAdapter.notifyDataSetChanged();
+        putCitiesInRecycler();
+    }
+
+    /**
+     * Give the list of cities to the adapter and bind
+     */
+    public void putCitiesInRecycler(){
+        cityAdapter = new LocationAdapter(cities, this);
+        locationRecycler.swapAdapter(cityAdapter, true);
+    }
+
 
     /**
      * Set up the Floating action button
