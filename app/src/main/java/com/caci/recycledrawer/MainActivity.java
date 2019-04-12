@@ -1,8 +1,10 @@
 package com.caci.recycledrawer;
 
-import android.content.Context;
 import android.os.Bundle;
 
+import com.caci.recycledrawer.data.CityHeaderData;
+import com.caci.recycledrawer.data.Location;
+import com.caci.recycledrawer.data.StateHeaderData;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -14,6 +16,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextSwitcher;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,24 +28,29 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Creates a RecyclerView of a list of states and gives it a bottom drawer behavior
+ * Creates a RecyclerView of a list of states and gives it a bottom drawer behavior.  When clicking
+ * on a state, the RecyclerView will be emptied, assigned a new adapter, and populated with a list
+ * of cities.
  */
 public class MainActivity extends AppCompatActivity {
 
     /**
      * List of location names
+     * First object is a StateHeaderData
+     * The rest are Strings of state names
      */
-    private List<String> states = new ArrayList<>();
+    private List<Object> states = new ArrayList<>();
 
     /**
      * List of city names
+     * First object in each list is a CityHeaderData
+     * The rest are names of cities as Strings
      */
-    private Map<String, List<String>> cities = new HashMap<>();
+    private Map<String, List<Object>> cities = new HashMap<>();
 
     /**
      * RecyclerView that will hold our states
@@ -82,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * Create the view
+     * Create the View
      * @param savedInstanceState
      */
     @Override
@@ -96,10 +105,10 @@ public class MainActivity extends AppCompatActivity {
         // Create floating action button
         createFab();
 
-        // Generate a list of states
+        // Generate a list of states from the json file in the assests dir
         generateLocations();
 
-        // Create the RecyclerView
+        // Create the RecyclerView populated with states
         createRecyclerView();
 
     }
@@ -132,12 +141,11 @@ public class MainActivity extends AppCompatActivity {
      * @param position - the item to remove
      */
     public void removeLocation(int position){
-//        states.remove(position);
         locationAdapter.notifyItemRemoved(position);
     }
 
     /**
-     * Remove all states from the adapter, which will empty the recyclerview
+     * Remove all objects from the adapter, which will empty the recyclerview
      */
     public void removeAllLocations(){
         locationAdapter.clear();
@@ -145,7 +153,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Give the list of cities (by state) to the adapter and bind
+     * Give the list of cities (by state) to the adapter and bind.  This will happen when
+     * a user clicks on a state and it's time to wipe the recyclerview and recreate it with
+     * matching city names
      */
     public void putCitiesInRecycler(String state){
         cityAdapter = new LocationAdapter(getCitiesByState(state), cityListerner);
@@ -159,6 +169,8 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Create the listeners to be used in the onclick for the recyclerview
+     * cityListener - what to do when a user clicks a city
+     * statelistener - what to do when a user clicks a state
      */
     public void createListeners(){
         // Log which city was clicked on
@@ -175,12 +187,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(int position) {
                 Log.i("Click", "Clicked state: " + position);
-                String state = states.get(position);
-                removeAllLocations();
-                putCitiesInRecycler(state);
+                if(states.get(position) instanceof String) {
+                    String state = (String)states.get(position);
+                    removeAllLocations();
+                    putCitiesInRecycler(state);
+                }
             }
         };
     }
+
+
 
 
 
@@ -209,17 +225,21 @@ public class MainActivity extends AppCompatActivity {
     private void generateLocations(){
         try {
             JSONArray array = new JSONArray(loadLocations());
+            ArrayList<String> stateNames = new ArrayList<>();
             for(int i=0; i<array.length(); i++){
                 JSONObject row = array.getJSONObject(i);
                 String state = row.get("state").toString();
                 String city = row.get("city").toString();
 
                 // Add city and state basic names
-                if(!states.contains(state)) {
-                    states.add(state);
+                if(!stateNames.contains(state)) {
+                    stateNames.add(state);
                 }
                 if(!cities.containsKey(state)){
-                    List<String> tempCity = new ArrayList<>();
+                    List<Object> tempCity = new ArrayList<>();
+                    // Create a header object with the state name and add it first
+                    //CityHeaderData cityHeader = new CityHeaderData(state);
+                    //tempCity.add(cityHeader);
                     tempCity.add(city);
                     cities.put(state, tempCity);
                 }else{
@@ -231,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                 locations.add(loc);
             }
             // Sort the list of states and cities alphebetically
-            sortStatesAndCities();
+            createAndSortStatesAndCities(stateNames);
         }catch (JSONException e) {
             e.printStackTrace();
         }
@@ -243,8 +263,8 @@ public class MainActivity extends AppCompatActivity {
      * @param state - the state to search for
      * @return - list of cities
      */
-    private List<String> getCitiesByState(String state){
-        List<String> cityList = new ArrayList<>();
+    private List<Object> getCitiesByState(String state){
+        List<Object> cityList = new ArrayList<>();
         if(cities.containsKey(state)){
             cityList = cities.get(state);
         }
@@ -254,10 +274,30 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Sort both the States list and all cities lists in the city hashmap
      */
-    public void sortStatesAndCities(){
-        Collections.sort(states);
-        for(List<String> tempCities : cities.values()){
-            Collections.sort(tempCities);
+    public void createAndSortStatesAndCities(ArrayList<String> stateNames){
+        // First sort the state names
+        Collections.sort(stateNames);
+        // Add a state header object followed by the sorted state list
+        StateHeaderData stateHeader = new StateHeaderData("US States", stateNames.size());
+        states.add(0, stateHeader);
+        states.addAll(stateNames);
+
+        // For every state, sort their city names
+        for(String key : cities.keySet()){
+            List<String> cityNames = new ArrayList<>();
+            String currentState = key;
+            for(Object cityObj : cities.get(key)){
+                if(cityObj instanceof String){
+                    cityNames.add((String)cityObj);
+                }
+            }
+            //Sort the list of city names only
+            Collections.sort(cityNames);
+            CityHeaderData newHeader = new CityHeaderData(currentState);
+            // Replace the current list
+            cities.get(key).clear();
+            cities.get(key).add(newHeader);
+            cities.get(key).addAll(cityNames);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.caci.recycledrawer;
+package com.caci.recycledrawer.data;
 
 /**
  * A Location made up of:
