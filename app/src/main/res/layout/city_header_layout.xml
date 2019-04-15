@@ -4,9 +4,20 @@
       - City name
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/colorLight"
+    >
+
+    <Button
+        android:id="@+id/city_header_back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back"
+        android:layout_marginLeft="16dp"
+        android:background="@color/colorPrimaryDark"
+        android:clickable="true"/>
 
     <!--Name of the City-->
     <TextView
@@ -16,7 +27,8 @@
         android:textSize="32dp"
         android:padding="32dp"
         android:textAlignment="center"
-        android:background="@color/colorLight"
         android:text="city"/>
+
+
 
 </LinearLayout>

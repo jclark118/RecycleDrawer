@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.caci.recycledrawer.data.CityHeaderData;
@@ -39,7 +40,6 @@ public class LocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * Constants to identify the type of view to be inflated
      */
     private static final int STATE_HEADER = 1;
-    private static final int CITY_HEADER = 2;
     private static final int LOCATION_ITEM = 3;
 
     /**
@@ -65,12 +65,9 @@ public class LocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if(viewType == LOCATION_ITEM) {
             View v = LayoutInflater.from(context).inflate(R.layout.location_row_layout, parent, false);
             holder = new LocationViewHolder(v);
-        } else if(viewType == STATE_HEADER){
+        } else{
             View v = LayoutInflater.from(context).inflate(R.layout.state_header_layout, parent, false);
             holder = new StateHeaderViewHolder(v);
-        } else {
-            View v = LayoutInflater.from(context).inflate(R.layout.city_header_layout, parent, false);
-            holder = new CityHeaderViewHolder(v);
         }
         return holder;
     }
@@ -87,8 +84,6 @@ public class LocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             bindLocation(holder, position);
         } else if (holder instanceof StateHeaderViewHolder){
             bindStateHeader(holder, position);
-        }else if (holder instanceof CityHeaderViewHolder){
-            bindCityHeader(holder, position);
         }
     }
 
@@ -118,18 +113,6 @@ public class LocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     /**
-     * Bind a City Header Object
-     * @param holder CityViewHolder object
-     * @param position should be 0
-     */
-    private void bindCityHeader(RecyclerView.ViewHolder holder, int position){
-        if(holder instanceof CityHeaderViewHolder){
-            CityHeaderViewHolder viewHolder = (CityHeaderViewHolder)holder;
-            viewHolder.getName().setText("City Header set");
-        }
-    }
-
-    /**
      * Called by default on every row when constructing the list.  This will tell the create
      * method what type of ViewHolder to construct
      * @param position
@@ -141,8 +124,6 @@ public class LocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             return STATE_HEADER;
         } else if(mLocations.get(position) instanceof String){
             return LOCATION_ITEM;
-        } else if(mLocations.get(position) instanceof CityHeaderData){
-            return CITY_HEADER;
         }
         return -1;
     }
@@ -231,43 +212,6 @@ public class LocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
 
-    /**
-     * View holder for a city header object.  Contains basic data about the city to be
-     * displayed at the top of the RecyclerView
-     * -----------------------------------------------------------------------------------
-     */
-    public class CityHeaderViewHolder extends RecyclerView.ViewHolder{
-
-        /**
-         * Name of the City
-         */
-        TextView name;
-
-        /**
-         * Constructor
-         * @param itemView
-         */
-        public CityHeaderViewHolder(@NonNull View itemView) {
-            super(itemView);
-            name = (TextView) itemView.findViewById(R.id.city_header_name);
-        }
-
-        /**
-         * Getters and setters
-         * @return
-         */
-        public TextView getName() {
-            return name;
-        }
-
-        public void setName(TextView name) {
-            this.name = name;
-        }
-    }
-
-
-
-
 
     /**
      * View holder for a state header object.  Contains basic data about the state to be
@@ -317,11 +261,4 @@ public class LocationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
 
-    /**
-     * Interface for the click listener on our recyclerview
-     * ----------------------------------------------------
-     */
-    public interface RecyclerViewClickListener {
-        void onClick(int position);
-    }
 }

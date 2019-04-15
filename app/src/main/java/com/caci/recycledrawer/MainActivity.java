@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Adapter for putting cities in the recyclerview
      */
-    private LocationAdapter cityAdapter;
+    private CityAdapter cityAdapter;
 
     /**
      * Floating action button to create new location
@@ -80,12 +81,17 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Click listener to be given to the recyclerview when a user clicks on a city
      */
-    private LocationAdapter.RecyclerViewClickListener cityListerner;
+    private RecyclerViewClickListener cityListerner;
 
     /**
      * Click listener to be given to the recyclerview when a user clicks on a state
      */
-    private LocationAdapter.RecyclerViewClickListener stateListerner;
+    private RecyclerViewClickListener stateListerner;
+
+    /**
+     * Click listener for the back button in the city headder
+     */
+    private View.OnClickListener cityBackListener;
 
 
 
@@ -151,13 +157,12 @@ public class MainActivity extends AppCompatActivity {
      * matching city names
      */
     public void putCitiesInRecycler(String state){
-        cityAdapter = new LocationAdapter(getCitiesByState(state), cityListerner);
+        cityAdapter = new CityAdapter(getCitiesByState(state), cityListerner, cityBackListener);
         // Give the recyclerview a new adapter.  We can't use "swapAdapter" because that will
         // keep the same click listener as before, when we really need a new click listener to
         // know what to do when clicking on a city
-        locationRecycler.setAdapter(cityAdapter);
 //        locationRecycler.swapAdapter(cityAdapter, true);
-
+        locationRecycler.setAdapter(cityAdapter);
     }
 
     /**
@@ -167,18 +172,16 @@ public class MainActivity extends AppCompatActivity {
      */
     public void createListeners(){
         // Log which city was clicked on
-        cityListerner = new LocationAdapter.RecyclerViewClickListener() {
+        cityListerner = new RecyclerViewClickListener() {
             @Override
             public void onClick(int position) {
-                Log.i("Click", "Clicked city: " + position);
-                //removeAllLocations();
-                putStatesInRecycler();
+                Log.i("Click", "Clicked position: " + position);
             }
         };
 
         // State listener will empty out all the state entries from the recyclerview, and attach
         // a new adapter to populate it with the list of cities for the state that was clicked on
-        stateListerner = new LocationAdapter.RecyclerViewClickListener() {
+        stateListerner = new RecyclerViewClickListener() {
             @Override
             public void onClick(int position) {
                 Log.i("Click", "Clicked state: " + position);
@@ -187,6 +190,16 @@ public class MainActivity extends AppCompatActivity {
                     //removeAllLocations();
                     putCitiesInRecycler(state);
                 }
+            }
+        };
+
+        // Listener for the back button in the citites header to take us back to the state view
+        cityBackListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("Click", "Clicked back button");
+
+                putStatesInRecycler();
             }
         };
     }
