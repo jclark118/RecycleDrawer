@@ -1,4 +1,4 @@
-This project shows a RecyclerView that acts as a bottom drawer.
+This Android project shows a RecyclerView that acts as a bottom drawer.
 
 Second step: Show a header object above the list of states and cities
 - Put a header on top of the list for both city and state views (different header for each)
